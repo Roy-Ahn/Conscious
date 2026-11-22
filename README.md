@@ -63,6 +63,16 @@ the command-line limit are passed through a file.
 - `LAB_BACKEND=upstream` in `.env` switches back to upstream's OpenAI / DeepSeek calls.
   Use an upstream model name in `llm-backend` in that case.
 
+## Running from Cursor Cloud Agents (no local computer needed)
+
+This repo's Cloud Agent environment uses `scripts/setup_lab.sh --with-latex` as its install step,
+so new agents boot with the lab ready. `AGENTS.md` tells agents how to run an experiment in tmux,
+export the results to `results/<run>/`, and push them to a PR you can read on GitHub.
+
+1. Add `CURSOR_API_KEY` under Cursor Dashboard > Cloud Agents > Secrets.
+2. Start a Cloud Agent on this repo (web, mobile or Slack) with a request such as:
+   *"Run the lab on: does chain-of-thought help small LLMs on date arithmetic? Push the results."*
+
 ## Running research
 
 ```bash
