@@ -1,15 +1,16 @@
-# Small, low-cost AI-on-AI research run for checking the lab end to end.
-# Keys come from .env (OPENAI_API_KEY / DEEPSEEK_API_KEY); do not add `api-key` here.
+# Small AI-on-AI research run for checking the lab end to end. Runs on CPU only.
+# Every LLM call (agents and experiment code) goes to the Cursor model set by CURSOR_MODEL in .env.
 # Full option reference: third_party/AgentLaboratory/experiment_configs/MATH_agentlab.yaml
 
 # True = co-pilot mode: you are asked for the topic and give feedback between phases.
 copilot-mode: False
 
-research-topic: "Does self-consistency (majority voting over several sampled reasoning chains) improve gpt-4o-mini accuracy on grade-school math word problems, and how does the gain scale with the number of samples?"
+research-topic: "Does asking a large language model to verify and, if needed, correct its own answer (self-verification prompting) improve accuracy on grade-school math word problems compared with answering directly?"
 
-# Any model supported by third_party/AgentLaboratory/inference.py, e.g. gpt-4o-mini, gpt-4o, o3-mini, o1-mini, deepseek-chat
-llm-backend: "gpt-4o-mini"
-lit-review-backend: "gpt-4o-mini"
+# "cursor" uses CURSOR_MODEL; "cursor:<slug>" picks a specific model from `agent --list-models`.
+# With LAB_BACKEND=upstream use an upstream model name instead (gpt-4o-mini, o3-mini, deepseek-chat, ...).
+llm-backend: "cursor"
+lit-review-backend: "cursor"
 
 language: "English"
 num-papers-lit-review: 3
@@ -25,17 +26,18 @@ compile-latex: False
 
 task-notes:
   plan-formulation:
-    - 'Plan exactly ONE experiment. Keep it small: at most 100 GSM8K test questions.'
-    - 'The machine has 4 CPU cores, ~16 GB RAM and no GPU. Do not plan any model training.'
+    - 'Plan exactly ONE experiment. Keep it small: at most 50 GSM8K test questions.'
+    - 'Compute is limited: 4 CPU cores, ~16 GB RAM and NO GPU. Do not plan any model training or local model inference; use the provided query_llm() function for all model calls.'
     - "DO NOT PLAN FOR TOO LONG. Submit your plan soon."
   data-preparation:
-    - 'Load the data with: from datasets import load_dataset; gsm8k = load_dataset("openai/gsm8k", "main")["test"].select(range(100))'
+    - 'Load the data with: from datasets import load_dataset; gsm8k = load_dataset("openai/gsm8k", "main")["test"].select(range(50))'
   running-experiments:
     - "For all strings you instantiate you must use triple quotes (''')"
-    - 'Query the model with: query_gpt4omini(prompt=prompt, system=system_prompt, api_key=os.environ["OPENAI_API_KEY"], temperature=0.7)'
-    - 'Compare 1, 3 and 5 samples per question. Parallelize inference with concurrent.futures.ThreadPoolExecutor.'
-    - 'Produce one clear figure of accuracy vs. number of samples.'
+    - 'Query the model with: response = query_llm(prompt=prompt, system=system_prompt). It is already imported. Do not import openai or any other LLM client, and do not pass a temperature.'
+    - 'Each query_llm call takes several seconds. Parallelize with concurrent.futures.ThreadPoolExecutor(max_workers=4).'
+    - 'No GPU is available. Do not import torch or train models.'
+    - 'Produce one clear bar chart of accuracy for direct answering vs. self-verification.'
   results-interpretation:
-    - 'Report accuracy for each sample count and the absolute gain over a single sample.'
+    - 'Report accuracy for both conditions and the absolute difference.'
   report-writing:
-    - 'Keep the report short and include the accuracy-vs-samples figure.'
+    - 'Keep the report short and include the accuracy figure.'

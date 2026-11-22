@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Sets up the AI-assisted research laboratory (Agent Laboratory) environment.
+# Sets up the AI-assisted research laboratory (Agent Laboratory) environment, including the
+# Cursor CLI that the default LLM backend uses.
 #
 # Usage: scripts/setup_lab.sh [--with-latex] [--gpu]
 #   --with-latex  install pdflatex + the LaTeX packages the paper-writing agent uses (needs sudo/apt)
@@ -56,8 +57,13 @@ if [ "$WITH_LATEX" -eq 1 ]; then
     texlive-fonts-recommended texlive-fonts-extra texlive-science texlive-plain-generic
 fi
 
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v agent >/dev/null && ! command -v cursor-agent >/dev/null; then
+  curl -fsSL https://cursor.com/install | bash
+fi
+
 [ -f "$ROOT/.env" ] || cp "$ROOT/.env.example" "$ROOT/.env"
 
 python "$ROOT/scripts/smoke_test.py"
 echo
-echo "Lab ready. Add an API key to .env, then run: scripts/run_lab.sh configs/quickstart.yaml"
+echo "Lab ready. Add CURSOR_API_KEY to .env (or run \`agent login\`), then run: scripts/run_lab.sh"

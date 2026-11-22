@@ -1,4 +1,7 @@
-"""Checks that the Agent Laboratory environment is usable without spending any LLM tokens."""
+"""Checks that the Agent Laboratory environment is usable.
+
+By default no LLM request is made. `--live` additionally sends one tiny request to the configured backend.
+"""
 import os
 import shutil
 import sys
@@ -7,9 +10,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LAB = ROOT / "third_party" / "AgentLaboratory"
-sys.path.insert(0, str(LAB))
+sys.path[:0] = [str(ROOT / "lab"), str(LAB)]
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+os.environ["PATH"] = f"{Path.home() / '.local' / 'bin'}:{os.environ['PATH']}"
 
+env_file = ROOT / ".env"
+if env_file.exists():
+    for line in env_file.read_text().splitlines():
+        key, sep, value = line.partition("=")
+        if sep and not key.strip().startswith("#") and value.strip():
+            os.environ.setdefault(key.strip(), value.strip())
+
+BACKEND = os.getenv("LAB_BACKEND", "cursor")
+LIVE = "--live" in sys.argv
 failures = []
 
 
@@ -54,17 +67,51 @@ def arxiv_search():
     return res.splitlines()[0]
 
 
-def api_keys():
+def cursor_routing():
+    import cursor_backend
+    import inference
+    from tools import execute_code
+
+    cursor_backend.install()
+    if inference.query_model is not cursor_backend.query_model:
+        raise RuntimeError("inference.query_model was not replaced")
+    out = execute_code("print(query_llm.__module__, query_gpt4omini.__module__)", timeout=60).strip()
+    if out != "cursor_backend cursor_backend":
+        raise RuntimeError(f"experiment code does not see the Cursor helpers: {out!r}")
+    return "agent and experiment-code LLM calls go to the Cursor CLI"
+
+
+def cursor_cli():
+    import cursor_backend
+
+    return cursor_backend.cli_path()
+
+
+def cursor_auth():
+    import cursor_backend
+
+    return f"model: {cursor_backend.check()}"
+
+
+def upstream_keys():
     keys = [k for k in ("OPENAI_API_KEY", "DEEPSEEK_API_KEY") if os.getenv(k)]
-    env_file = ROOT / ".env"
-    if not keys and env_file.exists():
-        for line in env_file.read_text().splitlines():
-            k, _, v = line.partition("=")
-            if k.strip() in ("OPENAI_API_KEY", "DEEPSEEK_API_KEY") and v.strip():
-                keys.append(k.strip())
     if not keys:
         raise RuntimeError("no OPENAI_API_KEY / DEEPSEEK_API_KEY set; research runs will refuse to start")
     return ", ".join(keys)
+
+
+def live_request():
+    if BACKEND == "cursor":
+        import cursor_backend
+
+        reply = cursor_backend.complete("Reply with exactly the word OK.", "You are a test endpoint.")
+    else:
+        import inference
+
+        reply = inference.query_model("gpt-4o-mini", "Reply with exactly the word OK.", "You are a test endpoint.")
+    if "OK" not in reply:
+        raise RuntimeError(f"unexpected reply {reply[:200]!r}")
+    return reply[:80]
 
 
 def pdflatex():
@@ -84,7 +131,14 @@ def pdflatex():
 check("Agent Laboratory imports", import_lab)
 check("Experiment code execution", run_code)
 check("arXiv literature search", arxiv_search, required=False)
-check("LLM API key", api_keys, required=False)
+if BACKEND == "cursor":
+    check("Cursor CLI installed", cursor_cli)
+    check("Cursor backend routing", cursor_routing)
+    check("Cursor authentication", cursor_auth, required=LIVE)
+else:
+    check("Upstream API key", upstream_keys, required=LIVE)
+if LIVE:
+    check(f"Live {BACKEND} request", live_request)
 check("pdflatex", pdflatex, required=False)
 
 if failures:
