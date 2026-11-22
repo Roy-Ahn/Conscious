@@ -33,6 +33,7 @@ RUN_DIR="${RUN_DIR:-$ROOT/runs/$(date +%Y%m%d-%H%M%S)-$(basename "$CONFIG" .yaml
 mkdir -p "$RUN_DIR"
 cp "$CONFIG" "$RUN_DIR/config.yaml"
 echo "Run directory: $RUN_DIR"
+exec > >(tee -a "$RUN_DIR/run.log") 2>&1
 
 cd "$RUN_DIR"
 PYTHONPATH="$LAB${PYTHONPATH:+:$PYTHONPATH}" exec "$VENV/bin/python" "$ROOT/lab/launch.py" --yaml-location "$RUN_DIR/config.yaml"
