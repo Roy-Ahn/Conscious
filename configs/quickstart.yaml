@@ -1,0 +1,41 @@
+# Small, low-cost AI-on-AI research run for checking the lab end to end.
+# Keys come from .env (OPENAI_API_KEY / DEEPSEEK_API_KEY); do not add `api-key` here.
+# Full option reference: third_party/AgentLaboratory/experiment_configs/MATH_agentlab.yaml
+
+# True = co-pilot mode: you are asked for the topic and give feedback between phases.
+copilot-mode: False
+
+research-topic: "Does self-consistency (majority voting over several sampled reasoning chains) improve gpt-4o-mini accuracy on grade-school math word problems, and how does the gain scale with the number of samples?"
+
+# Any model supported by third_party/AgentLaboratory/inference.py, e.g. gpt-4o-mini, gpt-4o, o3-mini, o1-mini, deepseek-chat
+llm-backend: "gpt-4o-mini"
+lit-review-backend: "gpt-4o-mini"
+
+language: "English"
+num-papers-lit-review: 3
+num-papers-to-write: 1
+parallel-labs: False
+mlesolver-max-steps: 2
+papersolver-max-steps: 1
+lab-index: 1
+load-existing: False
+except-if-fail: False
+# Requires pdflatex (scripts/setup_lab.sh --with-latex)
+compile-latex: False
+
+task-notes:
+  plan-formulation:
+    - 'Plan exactly ONE experiment. Keep it small: at most 100 GSM8K test questions.'
+    - 'The machine has 4 CPU cores, ~16 GB RAM and no GPU. Do not plan any model training.'
+    - "DO NOT PLAN FOR TOO LONG. Submit your plan soon."
+  data-preparation:
+    - 'Load the data with: from datasets import load_dataset; gsm8k = load_dataset("openai/gsm8k", "main")["test"].select(range(100))'
+  running-experiments:
+    - "For all strings you instantiate you must use triple quotes (''')"
+    - 'Query the model with: query_gpt4omini(prompt=prompt, system=system_prompt, api_key=os.environ["OPENAI_API_KEY"], temperature=0.7)'
+    - 'Compare 1, 3 and 5 samples per question. Parallelize inference with concurrent.futures.ThreadPoolExecutor.'
+    - 'Produce one clear figure of accuracy vs. number of samples.'
+  results-interpretation:
+    - 'Report accuracy for each sample count and the absolute gain over a single sample.'
+  report-writing:
+    - 'Keep the report short and include the accuracy-vs-samples figure.'
