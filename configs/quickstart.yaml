@@ -1,0 +1,43 @@
+# Small AI-on-AI research run for checking the lab end to end. Runs on CPU only.
+# Every LLM call (agents and experiment code) goes to the Cursor model set by CURSOR_MODEL in .env.
+# Full option reference: third_party/AgentLaboratory/experiment_configs/MATH_agentlab.yaml
+
+# True = co-pilot mode: you are asked for the topic and give feedback between phases.
+copilot-mode: False
+
+research-topic: "Does asking a large language model to verify and, if needed, correct its own answer (self-verification prompting) improve accuracy on grade-school math word problems compared with answering directly?"
+
+# "cursor" uses CURSOR_MODEL; "cursor:<slug>" picks a specific model from `agent --list-models`.
+# With LAB_BACKEND=upstream use an upstream model name instead (gpt-4o-mini, o3-mini, deepseek-chat, ...).
+llm-backend: "cursor"
+lit-review-backend: "cursor"
+
+language: "English"
+num-papers-lit-review: 3
+num-papers-to-write: 1
+parallel-labs: False
+mlesolver-max-steps: 2
+papersolver-max-steps: 1
+lab-index: 1
+load-existing: False
+except-if-fail: False
+# Requires pdflatex (scripts/setup_lab.sh --with-latex)
+compile-latex: False
+
+task-notes:
+  plan-formulation:
+    - 'Plan exactly ONE experiment. Keep it small: at most 50 GSM8K test questions.'
+    - 'Compute is limited: 4 CPU cores, ~16 GB RAM and NO GPU. Do not plan any model training or local model inference; use the provided query_llm() function for all model calls.'
+    - "DO NOT PLAN FOR TOO LONG. Submit your plan soon."
+  data-preparation:
+    - 'Load the data with: from datasets import load_dataset; gsm8k = load_dataset("openai/gsm8k", "main")["test"].select(range(50))'
+  running-experiments:
+    - "For all strings you instantiate you must use triple quotes (''')"
+    - 'Query the model with: response = query_llm(prompt=prompt, system=system_prompt). It is already imported. Do not import openai or any other LLM client, and do not pass a temperature.'
+    - 'Each query_llm call takes several seconds. Parallelize with concurrent.futures.ThreadPoolExecutor(max_workers=4).'
+    - 'No GPU is available. Do not import torch or train models.'
+    - 'Produce one clear bar chart of accuracy for direct answering vs. self-verification.'
+  results-interpretation:
+    - 'Report accuracy for both conditions and the absolute difference.'
+  report-writing:
+    - 'Keep the report short and include the accuracy figure.'

@@ -1,0 +1,8 @@
+# Installed on top of third_party/AgentLaboratory/requirements.txt.
+# Upstream imports these at startup but does not list them: tensorflow (common_imports.py),
+# flask / flask-sqlalchemy / sentence-transformers (app.py, used for AgentRxiv).
+tensorflow-cpu==2.18.0
+tf-keras==2.18.0
+flask==3.1.0
+flask-sqlalchemy==3.1.1
+sentence-transformers==3.3.1
