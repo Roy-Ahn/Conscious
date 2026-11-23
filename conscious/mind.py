@@ -82,8 +82,9 @@ class Config:
 
     # sleep
     auto_sleep: bool = True
-    sleep_passes: int = 40
-    sleep_rounds: int = 4
+    sleep_passes: int = 120
+    sleep_rounds: int = 12
+    sleep_min_steps: int = 60
     batch: int = 32
     grow_tolerance: float = 0.15
     grow_factor: float = 0.5
@@ -134,6 +135,7 @@ class Mind:
         self.pain = PainSystem(enabled=cfg.affect)
         self.drives = DriveSystem(enabled=cfg.affect)
         self.energy = 1.0
+        self.mood = 0.0
         self.tick = 0
         self.familiar: set[tuple[int, ...]] = set()
         self.forbidden: dict[tuple[int, ...], dict[int, float]] = {}
@@ -237,12 +239,13 @@ class Mind:
             votes = np.zeros(len(self.vocab))
             np.add.at(votes, self.memory.nxt[: self.memory.n][exact],
                       self.memory.strength[: self.memory.n][exact])
+            total = votes.sum()
             for token, weight in self._bans(context).items():
                 votes[token] *= 1.0 - weight
             top = int(np.argmax(votes))
-            share = float(votes[top] / max(votes.sum(), 1e-12))
+            share = float(votes[top] / total)
             if share >= 0.5:
-                return Thought(votes / max(votes.sum(), 1e-12), top, share,
+                return Thought(votes / total, top, share,
                                min(len(context), self.memory.L), "recollected",
                                steps, 2, path)
 
@@ -329,15 +332,17 @@ class Mind:
                 blamed = held[self.memory.nxt[held] == thought.top]
                 self.memory.destabilise(blamed, cfg.revise_rate * felt)
 
-        hurting = self.pain.total()
+        # A surprising moment is written harder. A moment lived while
+        # already in pain is written to last. Pain of either kind makes
+        # the cortex more plastic.
         self.memory.observe(rev, truncated, outcome, pos,
                             strength * (1.0 + felt),
-                            1.0 + cfg.pain_salience * hurting,
+                            1.0 + cfg.pain_salience * self.mood,
                             source, self.tick, span)
         self.familiar.add(self._seen(context))
         if cfg.use_cortex:
             self.cortex.learn(rev[None, :], np.array([outcome]),
-                              1.0 + cfg.pain_plasticity * hurting)
+                              1.0 + cfg.pain_plasticity * self.pain.total())
         if cfg.capacity is not None and self.memory.count > cfg.capacity:
             room = max(1, cfg.capacity // 20)
             _, lost = self.memory.evict(self.memory.count - cfg.capacity + room)
@@ -372,7 +377,7 @@ class Mind:
         """
         tokens = self._encode(text)
         context = [self.vocab.bos] + tokens
-        pain_before = self.pain.total()
+        pain_before = self.mood = self.pain.total()
         if tokens and tokens[-1] == self.vocab.end and expect is None:
             self._absorb(context)
             reply = Reply("", [])
@@ -541,8 +546,9 @@ class Mind:
 
             left, short = residual()
             report["residual_before"] = left
-            steps = max(1, cfg.sleep_passes * memory.n // (cfg.batch * cfg.sleep_rounds))
-            for _ in range(cfg.sleep_rounds * 3):
+            steps = max(cfg.sleep_min_steps,
+                        cfg.sleep_passes * memory.n // (cfg.batch * cfg.sleep_rounds))
+            for _ in range(cfg.sleep_rounds):
                 if left <= cfg.grow_tolerance / 2:
                     break
                 priority = memory.salience[: memory.n] * (short + 0.1)

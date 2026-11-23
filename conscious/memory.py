@@ -113,6 +113,8 @@ class EpisodicMemory:
         if not voters.any():
             return votes, 0.0, 0, voters
         depth = csl[voters]
+        if fixed_window is not None:
+            depth = np.minimum(depth, need[voters])
         credit = self.strength[: self.n][voters] * np.where(depth >= self.L, 1.0, generalise)
         np.add.at(votes, self.nxt[: self.n][voters], credit * (1.0 + depth))
         window = int(min(need[voters].max(), context_len))
