@@ -7,7 +7,8 @@ from pathlib import Path
 
 
 def pct(x: float) -> str:
-    return f"{100 * x:.0f}%"
+    value = 100 * x
+    return f"{value:.0f}%" if abs(value - round(value)) < 0.05 else f"{value:.1f}%"
 
 
 def num(x: float) -> str:

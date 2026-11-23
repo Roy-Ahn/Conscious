@@ -9,8 +9,8 @@ Two unrelated sets of 108 made-up facts ("A" then "B"). "Told once" means each f
 |  | recall of A | recall of B | recall of A after learning B |
 | --- | --- | --- | --- |
 | full model, told once | 100% | 100% | 100% |
-| network alone, told 1x | 6% | 8% | 0% |
-| network alone, told 20x | 71% | 67% | 0% |
+| network alone, told 1x | 6.1% | 7.6% | 0% |
+| network alone, told 20x | 70.6% | 66.7% | 0% |
 
 ## 2. Switching between System 1 and System 2
 
@@ -20,9 +20,9 @@ Facts are told once, then the model sleeps. "Steps" counts every look-up made to
 
 | mode | told directly (1 fact) | never told (2 facts chained) | never told (3 facts chained) | cannot be known |
 | --- | --- | --- | --- | --- |
-| System 1 only | 100% | 0% | 5% | 98% |
-| System 2 always | 100% | 100% | 100% | 99% |
-| switching | 100% | 100% | 100% | 99% |
+| System 1 only | 100% | 0% | 5.2% | 98.3% |
+| System 2 always | 100% | 100% | 99.8% | 99.2% |
+| switching | 100% | 100% | 99.8% | 99.2% |
 
 **Used System 2**
 
@@ -30,7 +30,7 @@ Facts are told once, then the model sleeps. "Steps" counts every look-up made to
 | --- | --- | --- | --- | --- |
 | System 1 only | 0% | 0% | 0% | 0% |
 | System 2 always | 100% | 100% | 100% | 100% |
-| switching | 0% | 100% | 100% | 100% |
+| switching | 0% | 100% | 99.8% | 100% |
 
 **Steps per question**
 
@@ -56,11 +56,11 @@ Each task's answer depends on exactly the last *d* words; anything earlier is no
 | context | d=1 | d=2 | d=3 | d=5 | d=8 | d=12 | all |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | flexible | 100% | 100% | 100% | 100% | 100% | 100% | 100% |
-| fixed at 1 | 100% | 52% | 50% | 50% | 50% | 50% | 59% |
-| fixed at 2 | 10% | 100% | 50% | 50% | 50% | 50% | 52% |
-| fixed at 3 | 0% | 12% | 100% | 50% | 50% | 50% | 44% |
-| fixed at 5 | 0% | 2% | 0% | 100% | 50% | 50% | 34% |
-| fixed at 8 | 0% | 2% | 0% | 0% | 100% | 50% | 25% |
+| fixed at 1 | 100% | 52% | 50% | 50% | 50% | 50% | 58.7% |
+| fixed at 2 | 10% | 100% | 50% | 50% | 50% | 50% | 51.7% |
+| fixed at 3 | 0% | 12% | 100% | 50% | 50% | 50% | 43.7% |
+| fixed at 5 | 0% | 2% | 0% | 100% | 50% | 50% | 33.7% |
+| fixed at 8 | 0% | 2% | 0% | 0% | 100% | 50% | 25.3% |
 | fixed at 12 | 0% | 2% | 0% | 0% | 0% | 100% | 17% |
 
 **Words of context the flexible model actually read**
@@ -89,9 +89,9 @@ The same experiences, once with the affect system on and once with it off. With 
 | --- | --- | --- |
 | Keeps a belief told 10 times after one false statement | 100% | 100% |
 | Repeats an answer it was rebuked for | 0% | 100% |
-| Memory cut to a quarter: recall of facts learned in pain | 100% | 38% |
-| Memory cut to a quarter: recall of facts learned calmly | 7% | 41% |
-| Memory cut to a quarter: recall of all facts | 31% | 40% |
+| Memory cut to a quarter: recall of facts learned in pain | 100% | 37.8% |
+| Memory cut to a quarter: recall of facts learned calmly | 7.4% | 41.1% |
+| Memory cut to a quarter: recall of all facts | 30.6% | 40.3% |
 | Invents an answer about someone it never heard of, before any rebuke | 41% | 58% |
 | The same, after being rebuked for it and after the pain has gone | 5% | 58% |
 | Rebukes it took | 1.0 | 6.0 |
@@ -119,10 +119,10 @@ The same experiences, once with the affect system on and once with it off. With 
 
 |  | recall of all facts | traces kept | hidden units at the end | times it slept |
 | --- | --- | --- | --- | --- |
-| no cortex | 29% | 240.0 | 24.0 | 19.0 |
-| cortex fixed at 4 units | 85% | 240.0 | 4.0 | 10.0 |
-| cortex that grows | 100% | 328.0 | 16.8 | 9.0 |
-| cortex that grows, no pain | 36% | 390.0 | 4.0 | 0.0 |
+| no cortex | 28.9% | 240.0 | 24.0 | 19.0 |
+| cortex fixed at 4 units | 85.1% | 240.0 | 4.0 | 10.0 |
+| cortex that grows | 99.7% | 328.0 | 16.8 | 9.0 |
+| cortex that grows, no pain | 35.8% | 390.0 | 4.0 | 0.0 |
 
 ## 6. Every interaction becomes training data
 
@@ -136,7 +136,7 @@ A 300-step conversation with no training phase. The teacher states facts, asks q
 | Statements / questions / questions with answer | 115.0 / 149.4 / 76.8 |
 | Praise / rebuke | 108.2 / 6.0 |
 | Facts that changed behind its back | 16.4 |
-| Share of all facts known after 100 / 200 / 300 steps | 70% / 84% / 92% |
+| Share of all facts known after 100 / 200 / 300 steps | 70.3% / 83.6% / 91.9% |
 
 ## 7. Desire: what curiosity buys
 
@@ -144,5 +144,5 @@ Half the facts are told. Then the model asks 60 questions of its own and the tea
 
 |  | known after 0 questions | known after 20 questions | known after 40 questions | known after 60 questions | questions that taught something new |
 | --- | --- | --- | --- | --- | --- |
-| curious (drives on) | 50% | 63% | 75% | 86% | 39.0 |
-| drives off (asks at random) | 50% | 56% | 61% | 67% | 18.8 |
+| curious (drives on) | 50% | 63% | 75% | 86.1% | 39.0 |
+| drives off (asks at random) | 50% | 55.6% | 61.1% | 67.4% | 18.8 |
