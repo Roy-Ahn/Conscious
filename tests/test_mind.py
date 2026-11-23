@@ -134,6 +134,15 @@ def test_a_rebuked_answer_is_not_repeated():
     assert reply.abstained
 
 
+def test_after_a_rebuke_the_corrected_answer_is_given_even_while_it_still_hurts():
+    mind = calm(taught())
+    assert mind.interact("bob home").text == "rome"
+    mind.feedback(-1)
+    mind.interact("bob home", expect="lima")
+    assert mind.pain.level("rebuke") > 0.5
+    assert mind.interact("bob home").text == "lima"
+
+
 def test_without_affect_a_rebuke_changes_nothing():
     mind = taught(affect=False)
     assert mind.interact("ann parent").text == "bob"
@@ -163,9 +172,10 @@ def test_praise_lifts_a_prohibition_and_soothes():
 
 def test_a_pain_point_added_at_run_time_changes_behaviour():
     mind = calm(taught())
+    assert mind.interact("ann parent").system == 1
     bar = mind._confidence_needed()
     mind.pain.add_point("loneliness", decay=0.01)
-    mind.pain.inflict("loneliness", 0.8)
+    mind.pain.inflict("loneliness", 0.9)
     assert mind._confidence_needed() > bar
     assert mind.interact("ann parent").system == 2
 
@@ -184,10 +194,44 @@ def test_pain_makes_the_mind_change_its_beliefs_faster():
 
 
 def test_one_contradiction_shakes_a_well_established_belief_but_does_not_overturn_it():
-    mind = taught(["sky colour blue ."] * 10, auto_sleep=False)
+    mind = calm(taught(["sky colour blue ."] * 10, auto_sleep=False))
+    before = copy.deepcopy(mind).interact("sky colour")
     mind.interact("sky colour green .")
-    assert copy.deepcopy(mind).interact("sky colour").abstained
-    assert calm(mind).interact("sky colour").text == "blue"
+    after = mind.interact("sky colour")
+    assert before.text == after.text == "blue"
+    assert before.system == 1 and after.system == 2
+    assert after.confidence < before.confidence
+
+
+def test_rebukes_for_wrong_answers_leave_lasting_caution():
+    mind = calm(taught())
+    start = mind.caution
+    for question in ("ann parent", "bob parent", "carl parent"):
+        mind.interact(question)
+        mind.feedback(-1)
+    calm(mind)
+    assert mind.caution > start
+    assert mind._abstain_below() > start
+
+
+def test_a_rebuke_for_silence_makes_the_mind_bolder_and_more_curious():
+    mind = calm(taught())
+    start = mind.caution
+    assert mind.interact("zed parent").abstained
+    mind.interact("yan parent")
+    wanting = mind.drives.tension("curiosity")
+    mind.feedback(-1)
+    assert mind.caution < start
+    assert mind.drives.tension("curiosity") > wanting
+    assert mind.ask() == "yan parent"
+
+
+def test_praise_lowers_caution():
+    mind = calm(taught())
+    start = mind.caution
+    mind.interact("ann parent")
+    mind.feedback(+1)
+    assert mind.caution < start
 
 
 @pytest.mark.parametrize("affect", [True, False])
@@ -270,6 +314,38 @@ def test_the_cortex_grows_when_it_cannot_hold_what_was_lived():
     assert report["residual_after"] < 0.5 * stuck["residual_after"]
 
 
+def test_knowledge_survives_in_the_cortex_after_its_memories_are_gone():
+    world = World(chains=10, length=5, seed=4)
+    mind = taught(world.statements(), auto_sleep=False)
+    mind.sleep()
+    mind.memory.kill(np.flatnonzero(mind.memory.alive[: mind.memory.n]))
+    assert mind.memory.count == 0
+    replies = [mind.interact(q) for q, _ in world.facts()]
+    assert all(r.text == a for r, (_, a) in zip(replies, world.facts()))
+    assert all(r.sources[0] == "cortex" for r in replies)
+
+
+def test_dreaming_keeps_old_knowledge_while_new_knowledge_is_consolidated():
+    old, new = World(chains=8, length=5, seed=5), World(chains=8, length=5, seed=6)
+
+    def recall_of_old(dream: bool) -> float:
+        mind = taught(old.statements(), auto_sleep=False)
+        mind.sleep()
+        mind.memory.kill(np.flatnonzero(mind.memory.alive[: mind.memory.n]))
+        if not dream:
+            mind.familiar.clear()
+        for statement in new.statements():
+            mind.interact(statement)
+        report = mind.sleep()
+        assert (report["dreams"] > 0) == dream
+        mind.cfg.use_memory = False
+        mind.familiar.update(tuple([mind.vocab.bos] + mind.vocab.encode(q)) for q, _ in old.facts())
+        return float(np.mean([mind.interact(q).text == a for q, a in old.facts()]))
+
+    assert recall_of_old(dream=True) > 0.9
+    assert recall_of_old(dream=False) < 0.6
+
+
 def test_memory_shrinks_when_it_is_over_capacity():
     world = World(chains=12, length=5, seed=2)
     mind = taught(world.statements(), capacity=120)
@@ -323,6 +399,13 @@ def test_an_unanswered_question_stays_open_and_is_asked_back():
     assert mind.ask() == "zed parent"
 
 
+def test_several_sentences_in_one_text_are_learned_separately():
+    mind = Mind()
+    reply = mind.interact("ann parent bob . bob parent carl . ann parent parent")
+    assert reply.text == "carl"
+    assert calm(mind).interact("bob parent").text == "carl"
+
+
 def test_it_learns_from_conversation_alone():
     mind = Mind()
     first = mind.interact("moon colour", expect="silver")
@@ -352,7 +435,7 @@ def test_every_fact_is_known_after_being_told_once():
 
 def test_a_network_alone_does_not_learn_from_one_telling():
     world = World(chains=8, length=5, seed=1)
-    mind = taught(world.statements(), use_memory=False, allow_system2=False)
+    mind = taught(world.statements(), use_memory=False, allow_system2=False, awake_rate=1.0)
     right = sum(mind.interact(q).text == a for q, a in world.facts())
     assert right < 0.3 * len(world.facts())
 

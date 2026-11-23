@@ -1,0 +1,1014 @@
+{
+  "small_data": {
+    "seeds": 5,
+    "seconds": 20.6,
+    "mean": {
+      "facts_per_set": 108.0,
+      "full model, told once": {
+        "set A": 1.0,
+        "set A after set B": 1.0,
+        "set B": 1.0
+      },
+      "network alone, told 1x": {
+        "set A": 0.0611,
+        "set A after set B": 0.0,
+        "set B": 0.0759
+      },
+      "network alone, told 20x": {
+        "set A": 0.7056,
+        "set A after set B": 0.0,
+        "set B": 0.6667
+      }
+    },
+    "first_seed": {
+      "facts_per_set": 108,
+      "full model, told once": {
+        "set A": 1.0,
+        "set A after set B": 1.0,
+        "set B": 1.0
+      },
+      "network alone, told 1x": {
+        "set A": 0.046296296296296294,
+        "set A after set B": 0.0,
+        "set B": 0.037037037037037035
+      },
+      "network alone, told 20x": {
+        "set A": 0.7129629629629629,
+        "set A after set B": 0.0,
+        "set B": 0.7037037037037037
+      }
+    }
+  },
+  "systems": {
+    "seeds": 5,
+    "seconds": 10.8,
+    "mean": {
+      "by_mode": {
+        "System 1 only": {
+          "told directly (1 fact)": {
+            "accuracy": 1.0,
+            "system2": 0.0,
+            "steps": 2.0
+          },
+          "never told (2 facts chained)": {
+            "accuracy": 0.0,
+            "system2": 0.0,
+            "steps": 1.0
+          },
+          "never told (3 facts chained)": {
+            "accuracy": 0.0524,
+            "system2": 0.0,
+            "steps": 1.2143
+          },
+          "cannot be known": {
+            "accuracy": 0.9833,
+            "system2": 0.0,
+            "steps": 1.0167
+          }
+        },
+        "System 2 always": {
+          "told directly (1 fact)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 3.0
+          },
+          "never told (2 facts chained)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 5.987
+          },
+          "never told (3 facts chained)": {
+            "accuracy": 0.9976,
+            "system2": 1.0,
+            "steps": 9.9643
+          },
+          "cannot be known": {
+            "accuracy": 0.9917,
+            "system2": 1.0,
+            "steps": 2.0083
+          }
+        },
+        "switching": {
+          "told directly (1 fact)": {
+            "accuracy": 1.0,
+            "system2": 0.0,
+            "steps": 2.0
+          },
+          "never told (2 facts chained)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 5.0
+          },
+          "never told (3 facts chained)": {
+            "accuracy": 0.9976,
+            "system2": 0.9976,
+            "steps": 8.9714
+          },
+          "cannot be known": {
+            "accuracy": 0.9917,
+            "system2": 1.0,
+            "steps": 2.0083
+          }
+        }
+      },
+      "habit": {
+        "first time asked": {
+          "accuracy": 1.0,
+          "system2": 1.0,
+          "steps": 5.0
+        },
+        "second time asked": {
+          "accuracy": 1.0,
+          "system2": 0.0,
+          "steps": 2.0
+        }
+      }
+    },
+    "first_seed": {
+      "by_mode": {
+        "System 1 only": {
+          "told directly (1 fact)": {
+            "accuracy": 1.0,
+            "system2": 0.0,
+            "steps": 2.0
+          },
+          "never told (2 facts chained)": {
+            "accuracy": 0.0,
+            "system2": 0.0,
+            "steps": 1.0
+          },
+          "never told (3 facts chained)": {
+            "accuracy": 0.047619047619047616,
+            "system2": 0.0,
+            "steps": 1.119047619047619
+          },
+          "cannot be known": {
+            "accuracy": 0.9583333333333334,
+            "system2": 0.0,
+            "steps": 1.0416666666666667
+          }
+        },
+        "System 2 always": {
+          "told directly (1 fact)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 3.0
+          },
+          "never told (2 facts chained)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 5.9907407407407405
+          },
+          "never told (3 facts chained)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 9.988095238095237
+          },
+          "cannot be known": {
+            "accuracy": 0.9583333333333334,
+            "system2": 1.0,
+            "steps": 2.0416666666666665
+          }
+        },
+        "switching": {
+          "told directly (1 fact)": {
+            "accuracy": 1.0,
+            "system2": 0.0,
+            "steps": 2.0
+          },
+          "never told (2 facts chained)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 5.0
+          },
+          "never told (3 facts chained)": {
+            "accuracy": 1.0,
+            "system2": 1.0,
+            "steps": 8.988095238095237
+          },
+          "cannot be known": {
+            "accuracy": 0.9583333333333334,
+            "system2": 1.0,
+            "steps": 2.0416666666666665
+          }
+        }
+      },
+      "habit": {
+        "first time asked": {
+          "accuracy": 1.0,
+          "system2": 1.0,
+          "steps": 5.0
+        },
+        "second time asked": {
+          "accuracy": 1.0,
+          "system2": 0.0,
+          "steps": 2.0
+        }
+      }
+    }
+  },
+  "context": {
+    "seeds": 5,
+    "seconds": 18.3,
+    "mean": {
+      "flexible": {
+        "overall": 1.0,
+        "by_depth": {
+          "1": {
+            "accuracy": 1.0,
+            "window": 1.0
+          },
+          "2": {
+            "accuracy": 1.0,
+            "window": 2.0
+          },
+          "3": {
+            "accuracy": 1.0,
+            "window": 3.0
+          },
+          "5": {
+            "accuracy": 1.0,
+            "window": 5.0
+          },
+          "8": {
+            "accuracy": 1.0,
+            "window": 8.0
+          },
+          "12": {
+            "accuracy": 1.0,
+            "window": 12.0
+          }
+        },
+        "context_limit": 16.0
+      },
+      "fixed at 1": {
+        "overall": 0.5867,
+        "by_depth": {
+          "1": {
+            "accuracy": 1.0,
+            "window": 1.0
+          },
+          "2": {
+            "accuracy": 0.52,
+            "window": 1.06
+          },
+          "3": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "5": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 1.52
+          }
+        },
+        "context_limit": 16.0
+      },
+      "fixed at 2": {
+        "overall": 0.5167,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.1,
+            "window": 3.72
+          },
+          "2": {
+            "accuracy": 1.0,
+            "window": 2.0
+          },
+          "3": {
+            "accuracy": 0.5,
+            "window": 2.0
+          },
+          "5": {
+            "accuracy": 0.5,
+            "window": 2.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 2.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 2.48
+          }
+        },
+        "context_limit": 16.0
+      },
+      "fixed at 3": {
+        "overall": 0.4367,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.94
+          },
+          "2": {
+            "accuracy": 0.12,
+            "window": 4.86
+          },
+          "3": {
+            "accuracy": 1.0,
+            "window": 3.0
+          },
+          "5": {
+            "accuracy": 0.5,
+            "window": 3.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 3.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 3.44
+          }
+        },
+        "context_limit": 16.0
+      },
+      "fixed at 5": {
+        "overall": 0.3367,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.94
+          },
+          "2": {
+            "accuracy": 0.02,
+            "window": 5.16
+          },
+          "3": {
+            "accuracy": 0.0,
+            "window": 5.68
+          },
+          "5": {
+            "accuracy": 1.0,
+            "window": 5.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 5.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 5.36
+          }
+        },
+        "context_limit": 16.0
+      },
+      "fixed at 8": {
+        "overall": 0.2533,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.94
+          },
+          "2": {
+            "accuracy": 0.02,
+            "window": 5.16
+          },
+          "3": {
+            "accuracy": 0.0,
+            "window": 5.68
+          },
+          "5": {
+            "accuracy": 0.0,
+            "window": 6.0
+          },
+          "8": {
+            "accuracy": 1.0,
+            "window": 8.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 8.24
+          }
+        },
+        "context_limit": 16.0
+      },
+      "fixed at 12": {
+        "overall": 0.17,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.94
+          },
+          "2": {
+            "accuracy": 0.02,
+            "window": 5.16
+          },
+          "3": {
+            "accuracy": 0.0,
+            "window": 5.68
+          },
+          "5": {
+            "accuracy": 0.0,
+            "window": 6.0
+          },
+          "8": {
+            "accuracy": 0.0,
+            "window": 6.0
+          },
+          "12": {
+            "accuracy": 1.0,
+            "window": 12.0
+          }
+        },
+        "context_limit": 16.0
+      }
+    },
+    "first_seed": {
+      "flexible": {
+        "overall": 1.0,
+        "by_depth": {
+          "1": {
+            "accuracy": 1.0,
+            "window": 1.0
+          },
+          "2": {
+            "accuracy": 1.0,
+            "window": 2.0
+          },
+          "3": {
+            "accuracy": 1.0,
+            "window": 3.0
+          },
+          "5": {
+            "accuracy": 1.0,
+            "window": 5.0
+          },
+          "8": {
+            "accuracy": 1.0,
+            "window": 8.0
+          },
+          "12": {
+            "accuracy": 1.0,
+            "window": 12.0
+          }
+        },
+        "context_limit": 16
+      },
+      "fixed at 1": {
+        "overall": 0.5833333333333334,
+        "by_depth": {
+          "1": {
+            "accuracy": 1.0,
+            "window": 1.0
+          },
+          "2": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "3": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "5": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 1.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 1.0
+          }
+        },
+        "context_limit": 16
+      },
+      "fixed at 2": {
+        "overall": 0.5,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.9
+          },
+          "2": {
+            "accuracy": 1.0,
+            "window": 2.0
+          },
+          "3": {
+            "accuracy": 0.5,
+            "window": 2.0
+          },
+          "5": {
+            "accuracy": 0.5,
+            "window": 2.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 2.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 2.0
+          }
+        },
+        "context_limit": 16
+      },
+      "fixed at 3": {
+        "overall": 0.4166666666666667,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.9
+          },
+          "2": {
+            "accuracy": 0.0,
+            "window": 5.2
+          },
+          "3": {
+            "accuracy": 1.0,
+            "window": 3.0
+          },
+          "5": {
+            "accuracy": 0.5,
+            "window": 3.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 3.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 3.0
+          }
+        },
+        "context_limit": 16
+      },
+      "fixed at 5": {
+        "overall": 0.3333333333333333,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.9
+          },
+          "2": {
+            "accuracy": 0.0,
+            "window": 5.2
+          },
+          "3": {
+            "accuracy": 0.0,
+            "window": 5.7
+          },
+          "5": {
+            "accuracy": 1.0,
+            "window": 5.0
+          },
+          "8": {
+            "accuracy": 0.5,
+            "window": 5.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 5.0
+          }
+        },
+        "context_limit": 16
+      },
+      "fixed at 8": {
+        "overall": 0.25,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.9
+          },
+          "2": {
+            "accuracy": 0.0,
+            "window": 5.2
+          },
+          "3": {
+            "accuracy": 0.0,
+            "window": 5.7
+          },
+          "5": {
+            "accuracy": 0.0,
+            "window": 6.0
+          },
+          "8": {
+            "accuracy": 1.0,
+            "window": 8.0
+          },
+          "12": {
+            "accuracy": 0.5,
+            "window": 8.0
+          }
+        },
+        "context_limit": 16
+      },
+      "fixed at 12": {
+        "overall": 0.16666666666666666,
+        "by_depth": {
+          "1": {
+            "accuracy": 0.0,
+            "window": 3.9
+          },
+          "2": {
+            "accuracy": 0.0,
+            "window": 5.2
+          },
+          "3": {
+            "accuracy": 0.0,
+            "window": 5.7
+          },
+          "5": {
+            "accuracy": 0.0,
+            "window": 6.0
+          },
+          "8": {
+            "accuracy": 0.0,
+            "window": 6.0
+          },
+          "12": {
+            "accuracy": 1.0,
+            "window": 12.0
+          }
+        },
+        "context_limit": 16
+      }
+    }
+  },
+  "pain": {
+    "seeds": 5,
+    "seconds": 9.6,
+    "mean": {
+      "with pain": {
+        "told the old fact 3x": {
+          "tellings needed to change": 2.0,
+          "times it still gave the old answer": 0.0
+        },
+        "told the old fact 10x": {
+          "tellings needed to change": 3.0,
+          "times it still gave the old answer": 1.0
+        },
+        "told the old fact 30x": {
+          "tellings needed to change": 4.0,
+          "times it still gave the old answer": 2.0
+        },
+        "keeps a belief told 10x after one false statement": 1.0,
+        "repeats an answer it was rebuked for": 0.0,
+        "recall after losing three quarters of memory": {
+          "facts learned in pain": 1.0,
+          "facts learned calmly": 0.0741,
+          "all facts": 0.3056
+        },
+        "invents an answer about a stranger": {
+          "before any rebuke": 0.41,
+          "after being rebuked for it, pain gone": 0.05,
+          "rebukes received": 1.0,
+          "accuracy on known facts afterwards": 1.0
+        },
+        "known facts, not yet consolidated": {
+          "checked with System 2 when calm": 0.0,
+          "checked with System 2 while in pain": 1.0,
+          "steps when calm": 2.0,
+          "steps while in pain": 3.0,
+          "accuracy when calm": 1.0,
+          "accuracy while in pain": 1.0
+        }
+      },
+      "without pain": {
+        "told the old fact 3x": {
+          "tellings needed to change": 4.0,
+          "times it still gave the old answer": 3.0
+        },
+        "told the old fact 10x": {
+          "tellings needed to change": 11.0,
+          "times it still gave the old answer": 10.0
+        },
+        "told the old fact 30x": {
+          "tellings needed to change": 31.0,
+          "times it still gave the old answer": 30.0
+        },
+        "keeps a belief told 10x after one false statement": 1.0,
+        "repeats an answer it was rebuked for": 1.0,
+        "recall after losing three quarters of memory": {
+          "facts learned in pain": 0.3778,
+          "facts learned calmly": 0.4111,
+          "all facts": 0.4028
+        },
+        "invents an answer about a stranger": {
+          "before any rebuke": 0.58,
+          "after being rebuked for it, pain gone": 0.58,
+          "rebukes received": 6.0,
+          "accuracy on known facts afterwards": 1.0
+        },
+        "known facts, not yet consolidated": {
+          "checked with System 2 when calm": 0.0,
+          "checked with System 2 while in pain": 0.0,
+          "steps when calm": 2.0,
+          "steps while in pain": 2.0,
+          "accuracy when calm": 1.0,
+          "accuracy while in pain": 1.0
+        }
+      }
+    },
+    "first_seed": {
+      "with pain": {
+        "told the old fact 3x": {
+          "tellings needed to change": 2,
+          "times it still gave the old answer": 0
+        },
+        "told the old fact 10x": {
+          "tellings needed to change": 3,
+          "times it still gave the old answer": 1
+        },
+        "told the old fact 30x": {
+          "tellings needed to change": 4,
+          "times it still gave the old answer": 2
+        },
+        "keeps a belief told 10x after one false statement": 1.0,
+        "repeats an answer it was rebuked for": 0.0,
+        "recall after losing three quarters of memory": {
+          "facts learned in pain": 1.0,
+          "facts learned calmly": 0.07407407407407407,
+          "all facts": 0.3055555555555556
+        },
+        "invents an answer about a stranger": {
+          "before any rebuke": 0.3,
+          "after being rebuked for it, pain gone": 0.05,
+          "rebukes received": 1,
+          "accuracy on known facts afterwards": 1.0
+        },
+        "known facts, not yet consolidated": {
+          "checked with System 2 when calm": 0.0,
+          "checked with System 2 while in pain": 1.0,
+          "steps when calm": 2.0,
+          "steps while in pain": 3.0,
+          "accuracy when calm": 1.0,
+          "accuracy while in pain": 1.0
+        }
+      },
+      "without pain": {
+        "told the old fact 3x": {
+          "tellings needed to change": 4,
+          "times it still gave the old answer": 3
+        },
+        "told the old fact 10x": {
+          "tellings needed to change": 11,
+          "times it still gave the old answer": 10
+        },
+        "told the old fact 30x": {
+          "tellings needed to change": 31,
+          "times it still gave the old answer": 30
+        },
+        "keeps a belief told 10x after one false statement": 1.0,
+        "repeats an answer it was rebuked for": 1.0,
+        "recall after losing three quarters of memory": {
+          "facts learned in pain": 0.3333333333333333,
+          "facts learned calmly": 0.42592592592592593,
+          "all facts": 0.4027777777777778
+        },
+        "invents an answer about a stranger": {
+          "before any rebuke": 0.65,
+          "after being rebuked for it, pain gone": 0.65,
+          "rebukes received": 6,
+          "accuracy on known facts afterwards": 1.0
+        },
+        "known facts, not yet consolidated": {
+          "checked with System 2 when calm": 0.0,
+          "checked with System 2 while in pain": 0.0,
+          "steps when calm": 2.0,
+          "steps while in pain": 2.0,
+          "accuracy when calm": 1.0,
+          "accuracy while in pain": 1.0
+        }
+      }
+    }
+  },
+  "parameters": {
+    "seeds": 5,
+    "seconds": 57.3,
+    "mean": {
+      "pressure": {
+        "no cortex": {
+          "recall": 0.2889,
+          "traces kept": 240.0,
+          "hidden units": 24.0,
+          "sleeps": 19.0
+        },
+        "cortex fixed at 4 units": {
+          "recall": 0.8806,
+          "traces kept": 240.0,
+          "hidden units": 4.0,
+          "sleeps": 10.0
+        },
+        "cortex that grows": {
+          "recall": 0.9944,
+          "traces kept": 328.0,
+          "hidden units": 16.8,
+          "sleeps": 9.0
+        },
+        "cortex that grows, no pain": {
+          "recall": 0.3583,
+          "traces kept": 390.0,
+          "hidden units": 4.0,
+          "sleeps": 0.0
+        }
+      },
+      "traces needed to hold everything": 1280.0,
+      "facts": 360.0
+    },
+    "first_seed": {
+      "life": [
+        {
+          "event": "born",
+          "vocab": 3,
+          "hidden_units": 8,
+          "cortex_weights": 851,
+          "traces": 0,
+          "context_limit": 8,
+          "stream": 0,
+          "sleeps": 0
+        },
+        {
+          "event": "told 90 facts",
+          "vocab": 61,
+          "hidden_units": 8,
+          "cortex_weights": 2301,
+          "traces": 320,
+          "context_limit": 8,
+          "stream": 450,
+          "sleeps": 0
+        },
+        {
+          "event": "slept",
+          "vocab": 61,
+          "hidden_units": 40,
+          "cortex_weights": 7357,
+          "traces": 320,
+          "context_limit": 8,
+          "stream": 450,
+          "sleeps": 1
+        },
+        {
+          "event": "told 270 more facts",
+          "vocab": 217,
+          "hidden_units": 40,
+          "cortex_weights": 16249,
+          "traces": 1280,
+          "context_limit": 8,
+          "stream": 1800,
+          "sleeps": 1
+        },
+        {
+          "event": "slept",
+          "vocab": 217,
+          "hidden_units": 60,
+          "cortex_weights": 22529,
+          "traces": 1280,
+          "context_limit": 8,
+          "stream": 1800,
+          "sleeps": 2
+        },
+        {
+          "event": "met a task needing 12 words of context",
+          "vocab": 245,
+          "hidden_units": 60,
+          "cortex_weights": 24685,
+          "traces": 1339,
+          "context_limit": 16,
+          "stream": 1866,
+          "sleeps": 2
+        },
+        {
+          "event": "worked out 2-step answers",
+          "vocab": 245,
+          "hidden_units": 60,
+          "cortex_weights": 24685,
+          "traces": 1409,
+          "context_limit": 16,
+          "stream": 2283,
+          "sleeps": 2
+        }
+      ],
+      "pressure": {
+        "no cortex": {
+          "recall": 0.28888888888888886,
+          "traces kept": 240,
+          "hidden units": 24,
+          "sleeps": 19
+        },
+        "cortex fixed at 4 units": {
+          "recall": 0.9055555555555556,
+          "traces kept": 240,
+          "hidden units": 4,
+          "sleeps": 10
+        },
+        "cortex that grows": {
+          "recall": 0.9916666666666667,
+          "traces kept": 328,
+          "hidden units": 18,
+          "sleeps": 9
+        },
+        "cortex that grows, no pain": {
+          "recall": 0.35833333333333334,
+          "traces kept": 390,
+          "hidden units": 4,
+          "sleeps": 0
+        }
+      },
+      "traces needed to hold everything": 1280,
+      "facts": 360
+    }
+  },
+  "interactions": {
+    "seeds": 5,
+    "seconds": 1.5,
+    "mean": {
+      "turns": 455.6,
+      "turns that changed the model": 455.6,
+      "journal entries": 455.6,
+      "kinds": {
+        "statement": 115.4,
+        "question": 149.4,
+        "question with answer": 76.8,
+        "praise": 107.8,
+        "rebuke": 6.2,
+        "sleep": 0.0
+      },
+      "share of all facts known after n steps": {
+        "100": 0.7028,
+        "200": 0.8361,
+        "300": 0.9167
+      },
+      "recall of facts met in conversation": 0.943,
+      "facts met": 70.0,
+      "facts": 72.0,
+      "facts that changed behind its back": 16.4
+    },
+    "first_seed": {
+      "turns": 447,
+      "turns that changed the model": 447,
+      "journal entries": 447,
+      "kinds": {
+        "statement": 115,
+        "question": 140,
+        "question with answer": 79,
+        "praise": 106,
+        "rebuke": 7,
+        "sleep": 0
+      },
+      "share of all facts known after n steps": {
+        "100": 0.6388888888888888,
+        "200": 0.8194444444444444,
+        "300": 0.9027777777777778
+      },
+      "recall of facts met in conversation": 0.9420289855072463,
+      "facts met": 69,
+      "facts": 72,
+      "facts that changed behind its back": 17
+    }
+  },
+  "desire": {
+    "seeds": 5,
+    "seconds": 2.8,
+    "mean": {
+      "curious (drives on)": {
+        "facts known after n questions": {
+          "0": 0.5,
+          "20": 0.6296,
+          "40": 0.75,
+          "60": 0.8611
+        },
+        "questions that taught something new (of 60)": 39.0
+      },
+      "drives off (asks at random)": {
+        "facts known after n questions": {
+          "0": 0.5,
+          "20": 0.5556,
+          "40": 0.6111,
+          "60": 0.6741
+        },
+        "questions that taught something new (of 60)": 18.8
+      }
+    },
+    "first_seed": {
+      "curious (drives on)": {
+        "facts known after n questions": {
+          "0": 0.5,
+          "20": 0.6481481481481481,
+          "40": 0.7685185185185185,
+          "60": 0.8518518518518519
+        },
+        "questions that taught something new (of 60)": 38
+      },
+      "drives off (asks at random)": {
+        "facts known after n questions": {
+          "0": 0.5,
+          "20": 0.5648148148148148,
+          "40": 0.6018518518518519,
+          "60": 0.6388888888888888
+        },
+        "questions that taught something new (of 60)": 15
+      }
+    }
+  }
+}

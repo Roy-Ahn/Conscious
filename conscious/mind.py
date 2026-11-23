@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import pickle
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 
@@ -53,14 +53,18 @@ class Config:
     hidden: int = 24
     cortex_window: int = 6
     lr: float = 0.01
+    awake_rate: float = 0.02
     max_hidden: int = 512
     grow_cortex: bool = True
 
     # ego: when to deliberate, when to stay silent
     confidence_calm: float = 0.5
-    confidence_hurt: float = 0.9
+    confidence_hurt: float = 0.95
     abstain_calm: float = 0.3
-    abstain_hurt: float = 0.6
+    abstain_hurt: float = 0.7
+    caution_max: float = 0.6
+    caution_min: float = 0.1
+    caution_rate: float = 0.1
     prior_weight: float = 0.2
     novel_trust: float = 0.5
     reduce_confidence: float = 0.6
@@ -74,7 +78,7 @@ class Config:
     exhaustion_at: float = 0.3
 
     # how pain changes learning
-    revise_rate: float = 0.8
+    revise_rate: float = 0.6
     pain_salience: float = 2.0
     pain_plasticity: float = 2.0
     said_strength: float = 0.25
@@ -124,7 +128,7 @@ class Reply:
 
 class Mind:
     def __init__(self, config: Config | None = None, **overrides):
-        self.cfg = config or Config(**overrides)
+        self.cfg = replace(config, **overrides) if config else Config(**overrides)
         cfg = self.cfg
         self.rng = np.random.default_rng(cfg.seed)
         self.vocab = Vocab()
@@ -136,6 +140,7 @@ class Mind:
         self.drives = DriveSystem(enabled=cfg.affect)
         self.energy = 1.0
         self.mood = 0.0
+        self.caution = cfg.abstain_calm
         self.tick = 0
         self.familiar: set[tuple[int, ...]] = set()
         self.forbidden: dict[tuple[int, ...], dict[int, float]] = {}
@@ -165,8 +170,13 @@ class Mind:
         return float(np.clip(bar, 0.2, 0.97))
 
     def _abstain_below(self) -> float:
-        cfg = self.cfg
-        return cfg.abstain_calm + (cfg.abstain_hurt - cfg.abstain_calm) * self._vigilance()
+        """Below this confidence the mind says it does not know.
+
+        `caution` is its temperament: it starts at `abstain_calm`, rises
+        each time an answer is rebuked and falls with praise, so it lasts
+        after the pain has gone. Pain raises the bar further while it lasts.
+        """
+        return self.caution + (self.cfg.abstain_hurt - self.caution) * self._vigilance()
 
     def _spend(self, amount: float) -> None:
         self.energy = max(0.0, self.energy - amount)
@@ -187,9 +197,17 @@ class Mind:
         rev, _ = self.memory.key(context)
         context_len = min(len(context), self.memory.L)
         support, window = 0.0, 0
+        bans = self._bans(context)
         if cfg.use_memory:
             csl = self.memory.match(rev)
             votes, support, window, _ = self.memory.vote(csl, size, context_len, cfg.fixed_window)
+            if support > 0 and bans:
+                # A forbidden outcome loses its vote, and memory as a whole
+                # is trusted less by as much as it spoke for that outcome.
+                before = votes.sum()
+                for token, weight in bans.items():
+                    votes[token] *= 1.0 - weight
+                support *= votes.sum() / before
         if cfg.use_cortex:
             prior = self.cortex.predict(rev)
         else:
@@ -198,7 +216,7 @@ class Mind:
         # never been in. There it is believed only in part.
         if self._seen(context) not in self.familiar:
             prior = prior * cfg.novel_trust
-        if support > 0:
+        if support > 1e-9:
             trust = support / (support + cfg.prior_weight)
             probs = trust * votes / votes.sum() + (1.0 - trust) * prior
             source = "memory"
@@ -206,7 +224,7 @@ class Mind:
             probs = prior.copy()
             window = min(context_len, cfg.cortex_window)
             source = "cortex"
-        for token, weight in self._bans(context).items():
+        for token, weight in bans.items():
             probs[token] *= 1.0 - weight
         top = int(np.argmax(probs))
         return Thought(probs, top, float(probs[top]), window, source)
@@ -239,9 +257,9 @@ class Mind:
             votes = np.zeros(len(self.vocab))
             np.add.at(votes, self.memory.nxt[: self.memory.n][exact],
                       self.memory.strength[: self.memory.n][exact])
-            total = votes.sum()
             for token, weight in self._bans(context).items():
-                votes[token] *= 1.0 - weight
+                votes[token] *= 0.0 if weight >= 0.5 else 1.0 - weight
+            total = max(votes.sum(), 1e-12)
             top = int(np.argmax(votes))
             share = float(votes[top] / total)
             if share >= 0.5:
@@ -341,8 +359,10 @@ class Mind:
                             source, self.tick, span)
         self.familiar.add(self._seen(context))
         if cfg.use_cortex:
+            # Awake, the cortex moves only a little, or each new thing
+            # would overwrite the old. Its real learning is done asleep.
             self.cortex.learn(rev[None, :], np.array([outcome]),
-                              1.0 + cfg.pain_plasticity * self.pain.total())
+                              cfg.awake_rate * (1.0 + cfg.pain_plasticity * self.pain.total()))
         if cfg.capacity is not None and self.memory.count > cfg.capacity:
             room = max(1, cfg.capacity // 20)
             _, lost = self.memory.evict(self.memory.count - cfg.capacity + room)
@@ -376,9 +396,15 @@ class Mind:
         answer, the question itself is kept open.
         """
         tokens = self._encode(text)
-        context = [self.vocab.bos] + tokens
         pain_before = self.mood = self.pain.total()
-        if tokens and tokens[-1] == self.vocab.end and expect is None:
+        # Several sentences in one text are lived one after the other.
+        end = self.vocab.end
+        while end in tokens[:-1]:
+            cut = tokens.index(end) + 1
+            self._absorb([self.vocab.bos] + tokens[:cut])
+            tokens = tokens[cut:]
+        context = [self.vocab.bos] + tokens
+        if tokens and tokens[-1] == end and expect is None:
             self._absorb(context)
             reply = Reply("", [])
             self.last = None
@@ -471,7 +497,17 @@ class Mind:
         answer = [t for t in produced if t not in (self.vocab.end, self.vocab.unknown)]
         if value < 0:
             felt = self.pain.inflict("rebuke", abs(value) * (1.0 + self.drives.tension("bond")))
-            if felt > 0:
+            if felt > 0 and not answer:
+                # Rebuked for silence: be bolder, and want the answer more.
+                self.caution = max(cfg.caution_min, self.caution - 0.5 * cfg.caution_rate * felt)
+                question = tuple(context[1:])
+                if question in self.open_questions:
+                    self.open_questions.remove(question)
+                self.open_questions.insert(0, question)
+                curiosity = self.drives.drives["curiosity"]
+                curiosity.tension = min(1.0, curiosity.tension + 0.3)
+            elif felt > 0:
+                self.caution = min(cfg.caution_max, self.caution + cfg.caution_rate * felt)
                 for i, token in enumerate(produced):
                     if token not in answer:
                         continue
@@ -487,6 +523,9 @@ class Mind:
         else:
             self.drives.satisfy("bond", value)
             self.pain.soothe(0.3 * min(1.0, value))
+            if cfg.affect:
+                self.caution = max(cfg.caution_min,
+                                   self.caution - 0.2 * cfg.caution_rate * min(1.0, value))
             if answer:
                 base = self.memory.append_stream(context + produced)
                 for i, token in enumerate(produced):
@@ -526,38 +565,69 @@ class Mind:
         self.history.append({"tick": self.tick, **self.size()})
         return slept
 
+    def _dreams(self):
+        """Contexts the cortex has learned but memory no longer holds.
+
+        While asleep the cortex rehearses its own answers to these, so that
+        learning new things does not overwrite what only it remembers.
+        """
+        memory, window = self.memory, self.cfg.cortex_window
+        held = set()
+        for slot in range(memory.n):
+            row = memory.ctx[slot, :window]
+            held.add(tuple(int(t) for t in row[row >= 0][::-1]))
+        orphans = [c for c in self.familiar if c not in held]
+        if not orphans:
+            return np.zeros((0, window), np.int32), np.zeros(0, np.int32)
+        ctx = np.full((len(orphans), window), -1, dtype=np.int32)
+        for i, context in enumerate(orphans):
+            ctx[i, : len(context)] = context[::-1]
+        probs = self.cortex._forward(ctx)[4]
+        answer = probs.argmax(axis=1)
+        known = probs.max(axis=1) >= self.cfg.confidence_calm
+        return ctx[known], answer[known].astype(np.int32)
+
     def sleep(self) -> dict:
         """Replay what was lived into the cortex; grow it if it cannot hold it."""
         cfg = self.cfg
         memory, cortex = self.memory, self.cortex
         memory.compact()
-        report = {"traces": memory.n, "grown": 0, "pruned": 0, "evicted": 0,
+        report = {"traces": memory.n, "dreams": 0, "grown": 0, "pruned": 0, "evicted": 0,
                   "residual_before": None, "residual_after": None}
         if memory.n and cfg.use_cortex:
-            ctx = memory.ctx[: memory.n, : cfg.cortex_window]
-            targets = memory.nxt[: memory.n]
-            share = memory.shares()
-            weight = memory.salience[: memory.n] * share
+            n = memory.n
+            dream_ctx, dream_answer = self._dreams()
+            report["dreams"] = len(dream_answer)
+            ctx = np.concatenate([memory.ctx[:n, : cfg.cortex_window], dream_ctx])
+            targets = np.concatenate([memory.nxt[:n], dream_answer])
+            share = np.concatenate([memory.shares(), np.ones(len(dream_answer))])
+            salience = np.concatenate([memory.salience[:n], np.ones(len(dream_answer))])
+            weight = salience * share
+            certain = share >= 0.9
 
             def residual():
-                memory.mastery[: memory.n] = cortex.score(ctx, targets) / np.maximum(share, 1e-9)
-                short = np.clip(1.0 - memory.mastery[: memory.n], 0.0, 1.0)
+                mastery = cortex.score(ctx, targets) / np.maximum(share, 1e-9)
+                memory.mastery[:n] = mastery[:n]
+                short = np.clip(1.0 - mastery, 0.0, 1.0)
                 return float((weight * short).sum() / weight.sum()), short
 
             left, short = residual()
             report["residual_before"] = left
             steps = max(cfg.sleep_min_steps,
-                        cfg.sleep_passes * memory.n // (cfg.batch * cfg.sleep_rounds))
+                        cfg.sleep_passes * len(targets) // (cfg.batch * cfg.sleep_rounds))
             for _ in range(cfg.sleep_rounds):
-                if left <= cfg.grow_tolerance / 2:
+                # Only moments with one known outcome can be learned for sure.
+                unlearned = float((short[certain] > 0.5).mean()) if certain.any() else 0.0
+                if left <= cfg.grow_tolerance / 2 and unlearned <= 0.01:
                     break
-                priority = memory.salience[: memory.n] * (short + 0.1)
+                priority = salience * (short + 0.1)
                 priority /= priority.sum()
                 for _ in range(steps):
-                    batch = self.rng.choice(memory.n, size=min(cfg.batch, memory.n), p=priority)
+                    batch = self.rng.choice(len(targets), size=min(cfg.batch, len(targets)),
+                                            p=priority)
                     cortex.learn(ctx[batch], targets[batch])
                 before, (left, short) = left, residual()
-                stuck = left > cfg.grow_tolerance and left > 0.7 * before
+                stuck = left > cfg.grow_tolerance and left > 0.9 * before
                 if stuck:
                     self.pain.inflict("frustration", left)
                     wants_room = self.pain.level("frustration") > 0.1 if cfg.affect else True
@@ -648,6 +718,7 @@ class Mind:
             "pleasure": round(self.drives.pleasure, 4),
             "energy": round(self.energy, 4),
             "confidence_needed": round(self._confidence_needed(), 4),
+            "caution": round(self.caution, 4),
             "size": self.size(),
             "sleeps": self.sleeps,
             "interactions": len(self.journal),
@@ -666,6 +737,8 @@ class Mind:
         digest.update(memory.alive[: memory.n].tobytes())
         digest.update(str(len(memory.stream)).encode())
         digest.update(repr(sorted((k, sorted(v.items())) for k, v in self.forbidden.items())).encode())
+        digest.update(repr((self.caution, self.open_questions,
+                            [p.gain for p in self.pain.points.values()])).encode())
         return digest.hexdigest()
 
     def save(self, path: str) -> None:

@@ -216,7 +216,9 @@ class EpisodicMemory:
         if count <= 0 or slots.size == 0:
             return 0, 0.0
         count = min(count, slots.size)
-        worth = (self.strength[slots] * self.salience[slots]
+        # A trace is worth keeping if it decides its outcome (share), was
+        # lived in pain (salience), and the cortex does not know it yet.
+        worth = (self.shares()[slots] * self.salience[slots]
                  * (1.05 - np.clip(self.mastery[slots], 0.0, 1.0)))
         victims = slots[np.argsort(worth, kind="stable")[:count]]
         lost = float((1.0 - np.clip(self.mastery[victims], 0.0, 1.0)).mean())
