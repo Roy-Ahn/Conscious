@@ -320,7 +320,7 @@ def test_knowledge_survives_in_the_cortex_after_its_memories_are_gone():
     mind.sleep()
     mind.memory.kill(np.flatnonzero(mind.memory.alive[: mind.memory.n]))
     assert mind.memory.count == 0
-    replies = [mind.interact(q) for q, _ in world.facts()]
+    replies = [copy.deepcopy(mind).interact(q) for q, _ in world.facts()]
     assert all(r.text == a for r, (_, a) in zip(replies, world.facts()))
     assert all(r.sources[0] == "cortex" for r in replies)
 
@@ -368,6 +368,9 @@ INTERACTIONS = {
     "a question it knows": lambda m: m.interact("ann parent"),
     "a question it works out": lambda m: m.interact("ann parent parent"),
     "a question it cannot answer": lambda m: m.interact("zed parent"),
+    "the same unanswerable question again": lambda m: (m.interact("zed parent"),
+                                                       m.interact("zed parent")),
+    "a rebuke for not knowing": lambda m: (m.interact("zed parent"), m.feedback(-1)),
     "a question with the true answer": lambda m: m.interact("eve parent", expect="fay"),
     "praise": lambda m: (m.interact("ann parent"), m.feedback(+1)),
     "rebuke": lambda m: (m.interact("ann parent"), m.feedback(-1)),
@@ -377,11 +380,39 @@ INTERACTIONS = {
 @pytest.mark.parametrize("kind", INTERACTIONS)
 def test_every_kind_of_interaction_changes_the_model(kind):
     mind = calm(taught())
-    before, entries, stream = mind.fingerprint(), len(mind.journal), len(mind.memory.stream)
+    states = [mind.fingerprint(with_record=False)]
+    entries, stream = len(mind.journal), len(mind.memory.stream)
+    original_end = mind._end_of_moment
+
+    def end_of_moment():
+        states.append(mind.fingerprint(with_record=False))
+        return original_end()
+
+    mind._end_of_moment = end_of_moment
     INTERACTIONS[kind](mind)
-    assert mind.fingerprint() != before
-    assert len(mind.journal) > entries
+    assert len(states) >= 2
+    assert all(a != b for a, b in zip(states, states[1:])), "a turn left no mark on what is learned"
+    assert len(mind.journal) == entries + len(states) - 1
     assert len(mind.memory.stream) > stream
+
+
+def test_the_fingerprint_ignores_the_passing_of_time():
+    mind = taught()
+    before = mind.fingerprint()
+    for _ in range(5):
+        mind.pain.tick()
+        mind.drives.tick(mind.pain)
+    assert mind.fingerprint() == before
+
+
+def test_a_confident_answer_from_the_cortex_alone_is_remembered_as_said():
+    world = World(chains=6, length=5, seed=4)
+    mind = taught(world.statements(), auto_sleep=False)
+    mind.sleep()
+    mind.memory.kill(np.flatnonzero(mind.memory.alive[: mind.memory.n]))
+    question, answer = world.facts()[0]
+    assert calm(mind).interact(question).text == answer
+    assert mind.memory.count > 0
 
 
 def test_answering_a_known_question_strengthens_the_memory_used():
@@ -396,6 +427,15 @@ def test_answering_a_known_question_strengthens_the_memory_used():
 def test_an_unanswered_question_stays_open_and_is_asked_back():
     mind = calm(taught())
     assert mind.interact("zed parent").abstained
+    assert mind.ask() == "zed parent"
+
+
+def test_the_question_most_often_left_unanswered_is_asked_back_first():
+    mind = calm(taught())
+    mind.interact("zed parent")
+    mind.interact("yan home")
+    mind.interact("yan home")
+    assert mind.ask() == "yan home"
     assert mind.ask() == "zed parent"
 
 

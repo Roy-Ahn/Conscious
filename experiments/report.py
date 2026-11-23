@@ -161,12 +161,14 @@ def interactions(r, first) -> str:
         "A 300-step conversation with no training phase. The teacher states facts, asks "
         "questions, praises right answers, rebukes wrong ones and then gives the right "
         "one, and answers when the model says it does not know. Now and then a fact "
-        "changes without the model being told. A turn \"changed the model\" if the hash "
-        "of everything it has learned (weights, memory traces, prohibitions, caution, "
-        "pain sensitivities, open questions) differs after it.",
+        "changes without the model being told. A turn \"changed what is learned\" if "
+        "the hash of the cortex weights, memory traces, prohibitions, caution level and "
+        "open questions differs after it. Pain levels and drive tensions are not in the "
+        "hash, because they drift with time anyway.",
         table(["", ""], [
             ["Turns", num(r["turns"])],
-            ["Turns that changed the model", num(r["turns that changed the model"])],
+            ["Turns recorded in the journal", num(r["turns recorded"])],
+            ["Turns that changed what is learned", num(r["turns that changed what is learned"])],
             ["Statements / questions / questions with answer",
              f"{num(kinds['statement'])} / {num(kinds['question'])} / {num(kinds['question with answer'])}"],
             ["Praise / rebuke", f"{num(kinds['praise'])} / {num(kinds['rebuke'])}"],

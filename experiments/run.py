@@ -324,16 +324,17 @@ def interactions(seed: int) -> dict:
     met: set[int] = set()
     kinds = {"statement": 0, "question": 0, "question with answer": 0,
              "praise": 0, "rebuke": 0, "sleep": 0}
-    turns = changed = 0
+    turns = changed = recorded = 0
     curve = {}
 
     def turn(kind, act):
-        nonlocal turns, changed
-        before = mind.fingerprint()
+        nonlocal turns, changed, recorded
+        before, entries = mind.fingerprint(with_record=False), len(mind.journal)
         result = act()
         kinds[kind] += 1
         turns += 1
-        changed += mind.fingerprint() != before
+        changed += mind.fingerprint(with_record=False) != before
+        recorded += len(mind.journal) > entries
         return result
 
     moves = 0
@@ -368,8 +369,8 @@ def interactions(seed: int) -> dict:
     kinds["sleep"] = mind.sleeps
     return {
         "turns": turns,
-        "turns that changed the model": changed,
-        "journal entries": len(mind.journal),
+        "turns recorded": recorded,
+        "turns that changed what is learned": changed,
         "kinds": kinds,
         "share of all facts known after n steps": curve,
         "recall of facts met in conversation": probe(mind, [facts[i] for i in sorted(met)])["accuracy"],

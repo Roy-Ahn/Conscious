@@ -1,7 +1,7 @@
 {
   "small_data": {
     "seeds": 5,
-    "seconds": 20.6,
+    "seconds": 20.9,
     "mean": {
       "facts_per_set": 108.0,
       "full model, told once": {
@@ -41,7 +41,7 @@
   },
   "systems": {
     "seeds": 5,
-    "seconds": 10.8,
+    "seconds": 11.4,
     "mean": {
       "by_mode": {
         "System 1 only": {
@@ -80,7 +80,7 @@
           "never told (3 facts chained)": {
             "accuracy": 0.9976,
             "system2": 1.0,
-            "steps": 9.9643
+            "steps": 9.981
           },
           "cannot be known": {
             "accuracy": 0.9917,
@@ -102,7 +102,7 @@
           "never told (3 facts chained)": {
             "accuracy": 0.9976,
             "system2": 0.9976,
-            "steps": 8.9714
+            "steps": 8.9786
           },
           "cannot be known": {
             "accuracy": 0.9917,
@@ -162,7 +162,7 @@
           "never told (3 facts chained)": {
             "accuracy": 1.0,
             "system2": 1.0,
-            "steps": 9.988095238095237
+            "steps": 10.0
           },
           "cannot be known": {
             "accuracy": 0.9583333333333334,
@@ -184,7 +184,7 @@
           "never told (3 facts chained)": {
             "accuracy": 1.0,
             "system2": 1.0,
-            "steps": 8.988095238095237
+            "steps": 9.0
           },
           "cannot be known": {
             "accuracy": 0.9583333333333334,
@@ -209,7 +209,7 @@
   },
   "context": {
     "seeds": 5,
-    "seconds": 18.3,
+    "seconds": 18.7,
     "mean": {
       "flexible": {
         "overall": 1.0,
@@ -637,7 +637,7 @@
   },
   "pain": {
     "seeds": 5,
-    "seconds": 9.6,
+    "seconds": 9.7,
     "mean": {
       "with pain": {
         "told the old fact 3x": {
@@ -785,7 +785,7 @@
   },
   "parameters": {
     "seeds": 5,
-    "seconds": 57.3,
+    "seconds": 72.0,
     "mean": {
       "pressure": {
         "no cortex": {
@@ -795,13 +795,13 @@
           "sleeps": 19.0
         },
         "cortex fixed at 4 units": {
-          "recall": 0.8806,
+          "recall": 0.8511,
           "traces kept": 240.0,
           "hidden units": 4.0,
           "sleeps": 10.0
         },
         "cortex that grows": {
-          "recall": 0.9944,
+          "recall": 0.9967,
           "traces kept": 328.0,
           "hidden units": 16.8,
           "sleeps": 9.0
@@ -883,7 +883,7 @@
           "vocab": 245,
           "hidden_units": 60,
           "cortex_weights": 24685,
-          "traces": 1409,
+          "traces": 1454,
           "context_limit": 16,
           "stream": 2283,
           "sleeps": 2
@@ -897,13 +897,13 @@
           "sleeps": 19
         },
         "cortex fixed at 4 units": {
-          "recall": 0.9055555555555556,
+          "recall": 0.8972222222222223,
           "traces kept": 240,
           "hidden units": 4,
           "sleeps": 10
         },
         "cortex that grows": {
-          "recall": 0.9916666666666667,
+          "recall": 0.9972222222222222,
           "traces kept": 328,
           "hidden units": 18,
           "sleeps": 9
@@ -923,31 +923,31 @@
     "seeds": 5,
     "seconds": 1.5,
     "mean": {
-      "turns": 455.6,
-      "turns that changed the model": 455.6,
-      "journal entries": 455.6,
+      "turns": 455.4,
+      "turns recorded": 455.4,
+      "turns that changed what is learned": 455.4,
       "kinds": {
-        "statement": 115.4,
+        "statement": 115.0,
         "question": 149.4,
         "question with answer": 76.8,
-        "praise": 107.8,
-        "rebuke": 6.2,
+        "praise": 108.2,
+        "rebuke": 6.0,
         "sleep": 0.0
       },
       "share of all facts known after n steps": {
         "100": 0.7028,
         "200": 0.8361,
-        "300": 0.9167
+        "300": 0.9194
       },
-      "recall of facts met in conversation": 0.943,
+      "recall of facts met in conversation": 0.9459,
       "facts met": 70.0,
       "facts": 72.0,
       "facts that changed behind its back": 16.4
     },
     "first_seed": {
       "turns": 447,
-      "turns that changed the model": 447,
-      "journal entries": 447,
+      "turns recorded": 447,
+      "turns that changed what is learned": 447,
       "kinds": {
         "statement": 115,
         "question": 140,
@@ -959,9 +959,9 @@
       "share of all facts known after n steps": {
         "100": 0.6388888888888888,
         "200": 0.8194444444444444,
-        "300": 0.9027777777777778
+        "300": 0.9166666666666666
       },
-      "recall of facts met in conversation": 0.9420289855072463,
+      "recall of facts met in conversation": 0.9565217391304348,
       "facts met": 69,
       "facts": 72,
       "facts that changed behind its back": 17
@@ -969,7 +969,7 @@
   },
   "desire": {
     "seeds": 5,
-    "seconds": 2.8,
+    "seconds": 2.9,
     "mean": {
       "curious (drives on)": {
         "facts known after n questions": {

@@ -54,10 +54,12 @@ def main() -> None:
             continue
         if line == ":quit":
             break
-        if line == "+":
-            mind.feedback(+1)
-        elif line == "-":
-            mind.feedback(-1)
+        if line in ("+", "-"):
+            if mind.last is None:
+                print("(nothing to judge yet)")
+            else:
+                mind.feedback(+1 if line == "+" else -1)
+                print(f"({'praised' if line == '+' else 'rebuked'}; {mind.report()['feeling']})")
         elif line == ":ask":
             print(mind.ask() or "(nothing to ask)")
         elif line == ":state":

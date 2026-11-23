@@ -147,7 +147,7 @@ class Mind:
         self.journal: list[dict] = []
         self.moments: list[dict] = []
         self.asked: set[tuple[int, ...]] = set()
-        self.open_questions: list[tuple[int, ...]] = []
+        self.open_questions: dict[tuple[int, ...], int] = {}
         self.last: dict | None = None
         self.sleeps = 0
         self.history: list[dict] = []
@@ -459,16 +459,13 @@ class Mind:
     def _wonder(self, context: list[int]) -> None:
         """A question it could not answer stays open and feeds curiosity."""
         question = tuple(context[1:])
-        if question not in self.open_questions:
-            self.open_questions.append(question)
+        self.open_questions[question] = self.open_questions.get(question, 0) + 1
         if self.cfg.affect:
             curiosity = self.drives.drives["curiosity"]
             curiosity.tension = min(1.0, curiosity.tension + 0.2)
 
     def _settle(self, context: list[int]) -> None:
-        question = tuple(context[1:])
-        if question in self.open_questions:
-            self.open_questions.remove(question)
+        self.open_questions.pop(tuple(context[1:]), None)
 
     def _keep_own_words(self, context, produced, thoughts) -> None:
         """What the model works out for itself becomes memory too."""
@@ -485,8 +482,17 @@ class Mind:
                 self.familiar.add(self._seen(here))
                 self.drives.satisfy("mastery", 0.3)
             elif (rev.tobytes(), token) in self.memory.index:
+                # Recalling a memory strengthens it.
                 self.memory.observe(rev, truncated, token, base + len(here),
                                     cfg.said_strength, 1.0, SAID, self.tick)
+            elif thought.confidence >= cfg.confidence_calm:
+                # What it said with confidence, from the cortex or by
+                # generalising, it now also remembers having said.
+                lesson = self.memory.learn_spans(rev, truncated, token, self.memory.match(rev))
+                self.memory.observe(rev, truncated, token, base + len(here),
+                                    cfg.said_strength, 1.0, SAID, self.tick,
+                                    lesson.new_span)
+                self.familiar.add(self._seen(here))
 
     def feedback(self, value: float) -> None:
         """Praise (value > 0) or rebuke (value < 0) for the last answer."""
@@ -501,9 +507,7 @@ class Mind:
                 # Rebuked for silence: be bolder, and want the answer more.
                 self.caution = max(cfg.caution_min, self.caution - 0.5 * cfg.caution_rate * felt)
                 question = tuple(context[1:])
-                if question in self.open_questions:
-                    self.open_questions.remove(question)
-                self.open_questions.insert(0, question)
+                self.open_questions[question] = self.open_questions.get(question, 0) + 2
                 curiosity = self.drives.drives["curiosity"]
                 curiosity.tension = min(1.0, curiosity.tension + 0.3)
             elif felt > 0:
@@ -663,7 +667,9 @@ class Mind:
         memory, vocab = self.memory, self.vocab
         capricious = (not self.cfg.affect) or self.drives.dominant() == "autonomy"
         while self.open_questions and not capricious:
-            question = self.open_questions.pop(0)
+            # The question it has most often been left without an answer to.
+            question = max(self.open_questions, key=self.open_questions.get)
+            del self.open_questions[question]
             if self._system1([vocab.bos, *question]).confidence < self.cfg.confidence_calm:
                 self.asked.add(question)
                 return vocab.decode(question)
@@ -724,21 +730,26 @@ class Mind:
             "interactions": len(self.journal),
         }
 
-    def fingerprint(self) -> str:
-        """A hash of everything learnable; changes whenever the model does."""
+    def fingerprint(self, with_record: bool = True) -> str:
+        """A hash of what the model has learned.
+
+        Covers the cortex weights, every memory trace, the prohibitions,
+        the caution level and the open questions. With `with_record` it
+        also covers the length of the lifelong stream, the raw record that
+        sleep replays from. Pain levels, sensitivities and drive tensions
+        are left out: they drift with time whether or not anything was
+        learned.
+        """
         digest = hashlib.sha256()
         for name in sorted(self.cortex.params):
             digest.update(self.cortex.params[name].tobytes())
         memory = self.memory
-        digest.update(memory.ctx[: memory.n].tobytes())
-        digest.update(memory.nxt[: memory.n].tobytes())
-        digest.update(memory.strength[: memory.n].tobytes())
-        digest.update(memory.span[: memory.n].tobytes())
-        digest.update(memory.alive[: memory.n].tobytes())
-        digest.update(str(len(memory.stream)).encode())
+        for array in (memory.ctx, memory.nxt, memory.strength, memory.span, memory.alive):
+            digest.update(array[: memory.n].tobytes())
         digest.update(repr(sorted((k, sorted(v.items())) for k, v in self.forbidden.items())).encode())
-        digest.update(repr((self.caution, self.open_questions,
-                            [p.gain for p in self.pain.points.values()])).encode())
+        digest.update(repr((self.caution, sorted(self.open_questions.items()))).encode())
+        if with_record:
+            digest.update(str(len(memory.stream)).encode())
         return digest.hexdigest()
 
     def save(self, path: str) -> None:

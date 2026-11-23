@@ -113,27 +113,28 @@ The same experiences, once with the affect system on and once with it off. With 
 | told 270 more facts | 217 | 40 | 16249 | 1280 | 8 |
 | slept | 217 | 60 | 22529 | 1280 | 8 |
 | met a task needing 12 words of context | 245 | 60 | 24685 | 1339 | 16 |
-| worked out 2-step answers | 245 | 60 | 24685 | 1409 | 16 |
+| worked out 2-step answers | 245 | 60 | 24685 | 1454 | 16 |
 
 **Memory too small for what is lived**: 360 facts need 1280 traces; memory is capped at 400. The model decides for itself when to sleep.
 
 |  | recall of all facts | traces kept | hidden units at the end | times it slept |
 | --- | --- | --- | --- | --- |
 | no cortex | 29% | 240.0 | 24.0 | 19.0 |
-| cortex fixed at 4 units | 88% | 240.0 | 4.0 | 10.0 |
-| cortex that grows | 99% | 328.0 | 16.8 | 9.0 |
+| cortex fixed at 4 units | 85% | 240.0 | 4.0 | 10.0 |
+| cortex that grows | 100% | 328.0 | 16.8 | 9.0 |
 | cortex that grows, no pain | 36% | 390.0 | 4.0 | 0.0 |
 
 ## 6. Every interaction becomes training data
 
-A 300-step conversation with no training phase. The teacher states facts, asks questions, praises right answers, rebukes wrong ones and then gives the right one, and answers when the model says it does not know. Now and then a fact changes without the model being told. A turn "changed the model" if the hash of everything it has learned (weights, memory traces, prohibitions, caution, pain sensitivities, open questions) differs after it.
+A 300-step conversation with no training phase. The teacher states facts, asks questions, praises right answers, rebukes wrong ones and then gives the right one, and answers when the model says it does not know. Now and then a fact changes without the model being told. A turn "changed what is learned" if the hash of the cortex weights, memory traces, prohibitions, caution level and open questions differs after it. Pain levels and drive tensions are not in the hash, because they drift with time anyway.
 
 |  |  |
 | --- | --- |
-| Turns | 455.6 |
-| Turns that changed the model | 455.6 |
-| Statements / questions / questions with answer | 115.4 / 149.4 / 76.8 |
-| Praise / rebuke | 107.8 / 6.2 |
+| Turns | 455.4 |
+| Turns recorded in the journal | 455.4 |
+| Turns that changed what is learned | 455.4 |
+| Statements / questions / questions with answer | 115.0 / 149.4 / 76.8 |
+| Praise / rebuke | 108.2 / 6.0 |
 | Facts that changed behind its back | 16.4 |
 | Share of all facts known after 100 / 200 / 300 steps | 70% / 84% / 92% |
 
